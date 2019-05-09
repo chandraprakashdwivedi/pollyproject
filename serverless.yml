@@ -15,7 +15,7 @@ provider:
     - Effect: "Allow"
       Action:
         - "s3:*"
-      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "uploadBucket" } ] ]  }
+      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "PollyBucket" } ] ]  }
     - Effect: "Allow"
       Action:
         - "polly:*"
