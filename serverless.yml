@@ -1,0 +1,82 @@
+service: sls-polly 
+
+plugins:
+  - serverless-s3-sync
+
+provider:
+  name: aws
+  runtime: python3.6
+  versionFunctions: false
+  stage: dev
+  region: ap-south-1
+  
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "uploadBucket" } ] ]  }
+    - Effect: "Allow"
+      Action:
+        - "polly:*"
+      Resource: "*"
+
+
+custom:
+  siteName: serverless-polly.com
+  aliasHostedZoneId: Z11RGJOFQNVJUP    # ap-south-1 We need to change this ID according to the region
+  aliasDNSName: s3-website-ap-south-1.amazonaws.com
+#  s3Sync:
+#    - bucketName:  ${self:service}-${self:provider.stage}-uploads
+#      localDir: www
+
+functions:         
+  weblink:
+    handler: lambda_functions/Speech_Converter.lambda_handler
+    memorySize: 128
+    description: My function
+    events:
+        - http:
+            path: lambda_functions/TextToSpeech
+            method: POST  
+            cors: true
+
+
+resources:
+  Resources:
+      PollyBucket:
+          Type: AWS::S3::Bucket
+          Properties:
+              BucketName: ${self:custom.siteName}
+              AccessControl: PublicRead
+              CorsConfiguration:
+                  CorsRules:
+                  - AllowedMethods:
+                    - GET
+                    - PUT
+                    - POST
+                    - HEAD
+                    AllowedOrigins:
+                    - "*"
+                    AllowedHeaders:
+                    - "*"
+              WebsiteConfiguration:
+                IndexDocument: signup.html
+                ErrorDocument: error.html
+              PolicyDocument:
+                Statement:
+                  - Sid: PublicReadGetObject
+                    Effect: Allow
+                    Principal: "*"
+                    Action:
+                    - s3:GetObject
+                    Resource:
+                      Fn::Join: [
+                        "", [
+                          "arn:aws:s3:::",
+                          {
+                            "Ref": "uploadBucket"
+                          },
+                          "/*"
+                        ]
+                      ]
