@@ -61,7 +61,7 @@ resources:
                     AllowedHeaders:
                     - "*"
               WebsiteConfiguration:
-                IndexDocument: signup.html
+                IndexDocument: converter.html
                 ErrorDocument: error.html
 
         StaticSiteS3BucketPolicy:
