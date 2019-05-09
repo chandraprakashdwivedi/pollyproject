@@ -44,9 +44,9 @@ functions:
 
 resources:
   Resources:
-      PollyBucket:
-          Type: AWS::S3::Bucket
-          Properties:
+        PollyBucket:
+            Type: AWS::S3::Bucket
+            Properties:
               BucketName: ${self:custom.siteName}
               AccessControl: PublicRead
               CorsConfiguration:
@@ -63,20 +63,26 @@ resources:
               WebsiteConfiguration:
                 IndexDocument: signup.html
                 ErrorDocument: error.html
-              PolicyDocument:
-                Statement:
-                  - Sid: PublicReadGetObject
-                    Effect: Allow
-                    Principal: "*"
-                    Action:
-                    - s3:GetObject
-                    Resource:
-                      Fn::Join: [
-                        "", [
-                          "arn:aws:s3:::",
-                          {
-                            "Ref": "PollyBucket"
-                          },
-                          "/*"
+
+        StaticSiteS3BucketPolicy:
+            Type: AWS::S3::BucketPolicy
+            Properties:
+                Bucket:
+                  Ref: PollyBucket
+                PolicyDocument:
+                  Statement:
+                    - Sid: PublicReadGetObject
+                      Effect: Allow
+                      Principal: "*"
+                      Action:
+                      - s3:GetObject
+                      Resource:
+                        Fn::Join: [
+                          "", [
+                            "arn:aws:s3:::",
+                            {
+                              "Ref": "PollyBucket"
+                            },
+                            "/*"
+                          ]
                         ]
-                      ]
